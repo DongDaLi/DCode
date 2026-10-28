@@ -4339,7 +4339,7 @@ nodes:
       - "off-peak-task scene"
       - "推荐提示词配置"
     docs:
-      - "docs/zcode-client-scenes-api.md"
+      - "docs/client-scenes-local-config.md"
     codeSeeds:
       - symbol: "IClientScenesService"
         file: "packages/services/src/client-scenes/clientScenes.ts"

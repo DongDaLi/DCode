@@ -22,6 +22,7 @@ import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import type { CodePreviewSettings } from "@/store/index.js";
 import { THEME_MODES } from "@/settings/settingsPageConfig.js";
 import { MAX_UI_FONT_SIZE_PX, MIN_UI_FONT_SIZE_PX } from "@/lib/uiFontSize.js";
+import { UI_FONT_FAMILY_OPTIONS } from "@/lib/uiFontFamily.js";
 
 function FontSizeInput({
   value,
@@ -85,6 +86,8 @@ export function AppearanceSectionContent({
   setTheme,
   uiFontSizePx,
   setUiFontSizePx,
+  uiFontFamilyId,
+  setUiFontFamilyId,
 }: {
   codePreviewSettings: CodePreviewSettings;
   setCodePreviewSettings: (settings: Partial<CodePreviewSettings>) => void;
@@ -92,6 +95,8 @@ export function AppearanceSectionContent({
   setTheme: (theme: Theme) => void;
   uiFontSizePx: number;
   setUiFontSizePx: (fontSizePx: number) => void;
+  uiFontFamilyId: string;
+  setUiFontFamilyId: (fontFamilyId: string) => void;
 }) {
   const { intl } = useZCodeIntl();
   const activePreviewMode = resolveTheme(theme);
@@ -150,6 +155,46 @@ export function AppearanceSectionContent({
                   onChange={setUiFontSizePx}
                   ariaLabel={intl.formatMessage({ id: "settings.uiFontSize" })}
                 />
+              }
+            />
+            <SettingsRow
+              label={intl.formatMessage({ id: "settings.uiFontFamily" })}
+              description={intl.formatMessage({
+                id: "settings.uiFontFamilyDescription",
+              })}
+              control={
+                <Select
+                  value={uiFontFamilyId}
+                  onValueChange={(value) => setUiFontFamilyId(value)}
+                >
+                  <SelectTrigger size="lg" className="w-[260px] min-w-0 justify-between">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {UI_FONT_FAMILY_OPTIONS.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="truncate"
+                            style={{ fontFamily: option.cssStack }}
+                            data-ui-font-family-preview={option.id}
+                          >
+                            {option.id === "system"
+                              ? intl.formatMessage({ id: "settings.uiFontFamily.system" })
+                              : option.label}
+                          </span>
+                          {option.requiresInstall ? (
+                            <span className="text-ui-xs text-foreground-subtlest">
+                              {intl.formatMessage({
+                                id: "settings.uiFontFamily.requiresInstall",
+                              })}
+                            </span>
+                          ) : null}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               }
             />
           </CardContent>

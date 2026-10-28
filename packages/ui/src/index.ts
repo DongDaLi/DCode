@@ -99,6 +99,11 @@ export {
   loadUiFontSizePx,
   subscribeToUiFontSizeStorageChanges,
 } from "./lib/uiFontSize.js";
+export {
+  applyUiFontFamilyId,
+  loadUiFontFamilyId,
+  subscribeToUiFontFamilyStorageChanges,
+} from "./lib/uiFontFamily.js";
 export { reportUiLaunchToInput } from "./lib/uiPerfArmsTelemetry.js";
 export {
   RendererUserActionTelemetry,

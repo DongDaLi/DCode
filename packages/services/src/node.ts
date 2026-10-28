@@ -2723,7 +2723,7 @@ export function createLocalServices(options: {
         }),
       }),
     )
-    .register(IClientScenesService, createClientScenesService({ apiClient }))
+    .register(IClientScenesService, createClientScenesService())
     .register(
       IOffPeakTaskService,
       (() => {

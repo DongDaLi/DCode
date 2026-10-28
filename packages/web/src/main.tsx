@@ -1,4 +1,5 @@
 import { mobilePluginDiscoveryTelemetrySchema } from "@zcode/shared";
+import { LOCAL_CLIENT_SCENES } from "@zcode/services/client-scenes-local";
 import {
   sessionCreateTelemetrySchema,
   type RendererTelemetryEventPayload,
@@ -971,10 +972,10 @@ export function createHomeOnlyWebRemoteControlServices(): RootServices {
         uiPluginRecommendations: [],
       }),
     }),
-    // 手机 Web 未连接 shared-host attachment 时禁止直连 scenes HTTP；返回空配置保持首页可用。
-    clientScenesService: createEmptyHomeOnlyService<RootServices["clientScenesService"]>({
-      list: async () => ({ code: 0, msg: "", data: [] }),
-    }),
+    // 本地内置快照：手机 Web 未连接 shared-host attachment 时也展示同一份推荐/模板目录。
+    clientScenesService: {
+      list: async () => structuredClone(LOCAL_CLIENT_SCENES),
+    },
     // 闲时任务仅桌面本地（D13）；web home-only 环境按不支持处理。
     offPeakTaskService:
       createUnsupportedHomeOnlyService<RootServices["offPeakTaskService"]>("offPeakTaskService"),

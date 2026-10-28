@@ -91,8 +91,8 @@ busy session
 - 主视图与编辑页内容容器统一复用 Settings 的共享框架内容令牌：`max-w-4xl`、响应式横向 padding、`pt-0` 和统一的底部留白；Automations 列表、定时任务编辑、闲时任务编辑与 Settings 各功能必须保持相同的内容列宽、左右起点和顶部基线。外层 workspace shell 继续保留桌面拖拽区、稳定滚动槽以及现有 `max-w-5xl` 响应式 route frame；Settings 对齐由内层共享内容令牌负责，禁止各 Automations 子页面再分别定义内容列宽和 padding。
 - 空首页以 Figma `⚫️ Z.ai - Zcode` 节点 `4798:2443` 为视觉事实源。桌面内容列的可见宽度为 802px；标题说明之后依次是 226px 空状态卡、44px 保持唤醒提示条、闲时任务模板和定时任务模板。空状态卡与提示条间距 16px，各主分区间距 32px，禁止把提示条移到空状态卡上方。
 - 空状态卡使用 16px 圆角和弱边框，文案与操作整体垂直居中。定时任务的 `Create via chat` 分体按钮与闲时任务创建按钮统一使用主按钮层级，Zai Dark 下为白底黑字，Zai Light 下按主按钮语义反转；左侧点击直接进入会话创建，箭头仅打开创建方式菜单。定时任务主按钮的文案在默认、hover 与菜单展开态都使用完整不透明度的 `text-primary-foreground`，不得通过降低默认透明度削弱可读性；outline 创建按钮继续保留既有的默认弱化层级。
-- 闲时任务模板与定时任务模板均按两列展示 Client Scenes 下发的当前目录。两类模板卡统一使用“标题行 / 可伸缩描述 / 底部时间信息”的三段纵向结构；定时模板的周期时间必须位于描述下方，不得拼接在标题行。模板卡统一使用 `114px` 最小高度、12px 圆角、12px 内边距和 16px 栅格间距；桌面双列布局中，同一行的卡片必须拉伸到该行内容最多卡片的高度，使两行与三行描述的卡片底边对齐，不得为此写死全局最大高度；手机端降为单列，文案可换行但不得挤出卡片。
-- Client Scenes 模板目录加载期间，当前可见的闲时 / 定时模板区保留分区标题，并分别显示默认 4 张模板卡骨架：桌面双列共两行，手机单列自然排为四行。骨架复用模板卡的 `114px` 最小高度、圆角、描边和栅格间距，不用整页 Spinner 替换已有任务与手动创建入口；请求成功、业务失败或网络失败后结束骨架态，再按真实目录或既有失败降级规则渲染。
+- 闲时任务模板与定时任务模板均按两列展示 Client Scenes 配置的当前目录（本地内置快照）。两类模板卡统一使用“标题行 / 可伸缩描述 / 底部时间信息”的三段纵向结构；定时模板的周期时间必须位于描述下方，不得拼接在标题行。模板卡统一使用 `114px` 最小高度、12px 圆角、12px 内边距和 16px 栅格间距；桌面双列布局中，同一行的卡片必须拉伸到该行内容最多卡片的高度，使两行与三行描述的卡片底边对齐，不得为此写死全局最大高度；手机端降为单列，文案可换行但不得挤出卡片。
+- Client Scenes 模板目录解析期间，当前可见的闲时 / 定时模板区保留分区标题，并分别显示默认 4 张模板卡骨架：桌面双列共两行，手机单列自然排为四行。骨架复用模板卡的 `114px` 最小高度、圆角、描边和栅格间距，不用整页 Spinner 替换已有任务与手动创建入口；目录就绪后结束骨架态，再按真实目录或空目录降级规则渲染。目录来自仓库内置快照，因此没有请求失败或网络失败分支。
 - Figma 的像素值必须映射到 `DESIGN.md` 的语义颜色、`text-ui-*` 字号和已有按钮/菜单基础组件；不得为了单一深色截图引入 raw hex、`text-[…]` 或只在 Zai Dark 下成立的透明白色样式。
 - 自动化主视图、定时任务创建/编辑、运行历史与相关菜单统一使用 UI 字号 token：既有 `text-ui-xs` 提升为 `text-ui-sm`；历史 `text-base` / `text-sm` / `text-xs` 分别迁移为 `text-ui-lg` / `text-ui-base` / `text-ui-sm`；`16px` / `14px` / `13px` / `12px` 分别迁移为 `text-ui-lg` / `text-ui-base` / `text-ui-base` / `text-ui-sm`，小于 `10px` 才使用 `text-ui-xs`。禁止继续新增 arbitrary UI font size。
 - 自动化首页的已创建任务卡片、闲时任务模板和定时任务模板中，标题之外的指令说明、调度信息、运行次数与“最早可用时段”也统一使用 `text-ui-base`；会话内创建成功卡片的“去到定时任务”按钮同样使用 `text-ui-base`，并以纯文字 `text-foreground` 高亮展示，不在文案后附加箭头或其他图标。按钮文字热区使用上下 `6px`、左右 `12px` 的内边距，兼顾紧凑密度与中英文点击区域。禁用态继续通过整体透明度表达不可用。这些文字不得因辅助信息角色降为 `text-ui-sm` / `text-ui-xs`，层级只通过字重与语义色表达。
@@ -154,7 +154,7 @@ body portal 更新 fixed left
 - 定时任务与闲时任务的 Instructions 底部工具栏必须使用同一套控件视觉和触发态：项目、权限、模型与推理控件统一为 `h-7`、`rounded-full`、`text-ui-base font-normal`，菜单项之间统一 `gap-0`；图标与文字内部仍保留 `4px` 间距。默认无背景，hover 与菜单展开期间统一使用 `bg-hover` 并提升为主文字色。权限 trigger 与项目、模型一致按内容自适应宽度；禁止用固定最小宽度或 `flex-1` 把箭头推离文案。下拉箭头统一使用 Lucide `ChevronDown` 的原生 `24 × 24` viewBox 与 `2px` 描边，在工具栏内渲染为 14px：项目、权限使用 20px 操作位，模型、推理使用 18px 操作位；禁止在操作位内再嵌套固定 20px 包装，避免紧凑项被裁切或视觉偏小。权限选择「完全访问」/ `yolo` 后，前置图标、文案和尾部箭头必须统一使用 `text-warning`，hover 与展开态也不得退回默认前景色。菜单统一向工具栏上方展开，和 trigger 保持 `4px` 间距。Draft New 的共享 Workspace 菜单 wrapper 必须使用 `contents`，只保留内部 trigger 作为唯一视觉与布局盒，避免双层控件；普通会话项目 chip 保持原样。
 - 定时任务的模型与 Think 选择必须直接复用会话 composer 的响应式触发器构成，不得在 Automations 内再维护一套常显文案或隐藏图标的变体：模型 trigger 在紧凑宽度下展示 `Package` 图标、达到 composer `sm` 宽度后展示模型身份文案与 chevron；该身份文案必须复用会话侧 `resolveV4ModelTriggerLabel` 规则，普通自定义供应商显示 `providerName/modelName`，Z.ai / BigModel 内置 family、失效值回落与窄屏裁剪继续以会话侧事实源为准，禁止 Automations 自行截掉 provider 只展示最后一级模型名。Think trigger 始终展示 `Brain` 图标，达到 composer `xl` 宽度后再展示档位文案与 chevron。Automations 的 Instructions 外框必须建立同名 `@container/composer` 查询上下文，使桌面端、普通 Web 与手机 Web 都按控件自身可用宽度切换；模型菜单、Think 档位排序、国际化文案、选中态及单档模型只读态继续由会话侧共享组件负责。Automations 仅允许保留“菜单向上展开、不恢复聊天输入焦点、模型元数据预览期间禁用”这三类页面语义差异。
 - 「添加计划」使用 Lucide `Plus` 的原生 `24 × 24` viewBox 与 `2px` 描边，在 20px 图标容器内渲染为 16px；图标颜色继承当前文本语义色。
-- 定时任务卡片菜单的更多、立即运行、暂停/恢复、编辑和删除统一使用 Lucide 图标的原生 `24 × 24` viewBox 与 `2px` 描边，渲染尺寸为 16px。模板卡片统一使用 12px 内边距、12px 内容与栅格间距，桌面双列、手机单列；描述和执行时间使用主题语义色 `text-foreground-subtle`。定时任务模板标题图标优先展示 Client Scenes prompt item 的可信 HTTPS `img`，以 `16px` 等比完整显示；`img` 缺失、不受信任或加载失败时，回退 Lucide `Target` / `Activity` / `FileText` / `List`，以 `16px` 尺寸和 `2px` 描边放入 20px 操作位并继承当前文字色。
+- 定时任务卡片菜单的更多、立即运行、暂停/恢复、编辑和删除统一使用 Lucide 图标的原生 `24 × 24` viewBox 与 `2px` 描边，渲染尺寸为 16px。模板卡片统一使用 12px 内边距、12px 内容与栅格间距，桌面双列、手机单列；描述和执行时间使用主题语义色 `text-foreground-subtle`。定时任务模板标题图标把配置 prompt item 的 `img` 解释为 Lucide canonical 名称并按名动态加载，以 `16px` 尺寸和 `2px` 描边放入 20px 操作位并继承当前文字色；`img` 缺失、名称未知或模块加载失败时回退 Lucide `Target` / `Activity` / `FileText` / `List`。
 - Automations 通用图标统一在 `AutomationIcons.tsx` 维护，并由 `AutomationDesignPrimitives` 对外复用；不得由各页面重复定义几何或加载裁切后的 Figma SVG / mask 资产。除下拉箭头的显式紧凑尺寸外，图标统一使用 Lucide 原生 `24 × 24` viewBox、16px 渲染尺寸和 `2px` 描边，颜色继承 `currentColor`，保证 Light / Dark / Zai 主题一致。
 - 通用图标语义映射固定为：提示 `Info`、闲时 `Moon`、定时状态 `Clock`、暂停状态与暂停动作 `CircleStop`、立即运行 `Play`、继续/恢复 `CirclePlay`、编辑 `Pencil`、更多 `Ellipsis`、跳转会话 `ExternalLink`、刷新 `RefreshCw`、删除 `Trash2`；取消运行使用填充 `currentColor` 的 `Square`。页面不得用其它近似图标覆盖这些映射。
 - 侧栏「自动化」按钮切换 workspace 主视图时，必须把 Automations 作为独立导航目标写入与会话共用的浏览器式前进/后退历史；从会话进入 Automations 后，顶部「后退」必须返回原会话，「前进」必须重新进入 Automations。会话创建卡片携带 `automationId` 打开详情时，该 ID 必须随导航条目保留，保证前进可恢复同一详情；推荐提示词可以携带 renderer-local 的 `automationTab` intent，前进恢复时仍应在目标 tab 实际可见的前提下切换。历史回放不得重复入栈或截断自身的前进分支。手机 `/remote` 不展示 Automations，因此不得生成此类导航条目。
@@ -188,11 +188,11 @@ body portal 更新 fixed left
 - 已创建任务卡片不展示所属项目名称或文件夹图标，保持标题、指令、运行状态与次数为主要信息；任务的 workspacePath / workspaceIdentity 仍保留用于编辑、执行和隔离。
 - 卡片的「下次运行」时间在 1 个月内展示相对时间；超过 1 个月展示本地绝对时间，避免远期任务出现难读的超大天数。
 - 已创建任务区与下方「更多灵感」之间使用整宽分割线区分内容层级；分割线使用与 Card 描边一致的 `card-border` 语义颜色，保证 Light / Dark 下层级清晰。
-- 首页的「定时任务模板」来自 `clientScenesService.list()` 响应中的 `scheduled-task` scene。卡片标题取 prompt item 的当前语言 `labels`，描述和表单 instructions 取当前语言 `contents`；两种语言标题均为空的模板直接拒绝。`defaults.cronExpr` 引用同 scene 的 `options.cronExpr.items`，实际 cron 只取被引用 item 当前语言 `contents`。cron 必须同时通过 Service 合法性校验与 Automation 编辑器无损往返校验，避免模板点击后在未编辑的情况下被 builder 静默改写。底部调度文案必须由客户端现有 cron 解析与本地化展示逻辑生成，不得把服务端 `labels` 当作调度外显真源。
-- 远程 cron 在模板映射阶段必须使用与 Service 最终校验相同的解析器校验；缺失引用或非法 cron 的模板不得进入卡片列表和创建链。`AutomationService` 保存前的最终校验继续保留，不能因为 UI 已过滤而删除。
-- 点击模板只打开创建表单并预填 title、cronExpr 与 instructions，不创建任务、不发送消息。点击时把当前语言配置值复制为普通用户草稿；进入表单后，语言切换、Client Scenes 重新请求或后台配置刷新不得覆盖用户编辑。远程模板对象与 option/default 元数据不得写入 automation 持久化，只有用户确认后的最终表单值可以保存。
-- Client Scenes 请求失败、返回业务错误、缺少 `scheduled-task` scene，或所有模板均被校验拒绝时，加载态必须结束，定时任务模板区展示本地化的「无可用模板」；手动创建、创建上限、项目候选、`workspaceIdentity?.trim() || workspacePath` 隔离和现有 Service/Repo/Scheduler 链路保持不变。
-- scheduled 与 off-peak 模板通过共享 `useClientScenesResource()` 从同一份 SWR 内存缓存映射。冷缓存才显示模板骨架；已有缓存时立即展示 last-known-good 目录并在后台重验，不回退骨架。10 分钟 dedupe 窗口内的重复挂载不再请求；不轮询。重验失败保留已展示目录，首次请求失败仍按空目录降级。缓存以注入的 Client Scenes Service authority 隔离，不进入任务持久化；locale 变化只重新映射缓存内容，不发起网络请求。Desktop 窗口关闭隐藏或 Web 页面进入后台后，只有实际经历 `hidden -> visible` 才绕过去重窗口强制重验；同一 Service/cache authority 的多个消费方合并为一次请求，普通 focus 不强制失效。
+- 首页的「定时任务模板」来自 `clientScenesService.list()` 返回的仓库内置 `scheduled-task` scene（见 `docs/client-scenes-local-config.md`）。卡片标题取 prompt item 的当前语言 `labels`，描述和表单 instructions 取当前语言 `contents`；两种语言标题均为空的模板直接拒绝。`defaults.cronExpr` 引用同 scene 的 `options.cronExpr.items`，实际 cron 只取被引用 item 当前语言 `contents`。cron 必须同时通过 Service 合法性校验与 Automation 编辑器无损往返校验，避免模板点击后在未编辑的情况下被 builder 静默改写。底部调度文案必须由客户端现有 cron 解析与本地化展示逻辑生成，不得把配置 `labels` 当作调度外显真源。
+- 配置 cron 在模板映射阶段必须使用与 Service 最终校验相同的解析器校验；缺失引用或非法 cron 的模板不得进入卡片列表和创建链。`AutomationService` 保存前的最终校验继续保留，不能因为 UI 已过滤而删除。
+- 点击模板只打开创建表单并预填 title、cronExpr 与 instructions，不创建任务、不发送消息。点击时把当前语言配置值复制为普通用户草稿；进入表单后，语言切换不得覆盖用户编辑。配置对象与 option/default 元数据不得写入 automation 持久化，只有用户确认后的最终表单值可以保存。
+- 缺少 `scheduled-task` scene，或所有模板均被校验拒绝时，加载态必须结束，定时任务模板区展示本地化的「无可用模板」；手动创建、创建上限、项目候选、`workspaceIdentity?.trim() || workspacePath` 隔离和现有 Service/Repo/Scheduler 链路保持不变。
+- scheduled 与 off-peak 模板通过共享 `useClientScenesResource()` 从同一份 SWR 内存缓存映射，数据源是仓库内置快照。首次解析前显示模板骨架，解析完成后展示目录，不再出现请求重试、后台重验或 last-known-good 降级。缓存以注入的 Client Scenes Service authority 隔离，不进入任务持久化；locale 变化只重新映射缓存内容。
 
 ```text
 clientScenesService.list()
@@ -200,16 +200,16 @@ clientScenesService.list()
         +--> pending: 当前可见模板区显示两行骨架，手动创建入口保持可用
         |
         v settled
-scheduled-task 远程候选目录 -- cron contents 本地校验/解析 --> 模板卡 / 失败空目录
+scheduled-task 内置候选目录 -- cron contents 本地校验/解析 --> 模板卡 / 空目录
         |                                                   |
-        | 后台刷新只更新候选目录                            | 点击时复制当前语言值
+        | 配置随发版更新，运行期不变                        | 点击时复制当前语言值
         v                                                   v
 下一次进入列表                                      AutomationEditView 本地草稿
                                                             |
                                                             `-- 用户确认 --> AutomationService --> automation record
 ```
 
-- 模板图标把远程 prompt item 的 `img` 解释为 Lucide canonical 名称并按名动态加载，不再发起图片 URL 请求。SVG 使用 `currentColor` 继承图标槽字色；空白值、未知名称或模块加载失败都进入本地回退。回退图标继续按远程 item id 的已知任务语义映射为 Lucide：morning/standup 使用 `Target`、risk/CI 使用 `Activity`、release/file 使用 `FileText`，其它动态模板统一回退 `List`；`imgs` 不参与图标选择，也不得为未知服务端模板临时引入页面内近似图标。
+- 模板图标把配置 prompt item 的 `img` 解释为 Lucide canonical 名称并按名动态加载，不再发起图片 URL 请求。SVG 使用 `currentColor` 继承图标槽字色；空白值、未知名称或模块加载失败都进入本地回退。回退图标继续按 item id 的已知任务语义映射为 Lucide：morning/standup 使用 `Target`、risk/CI 使用 `Activity`、release/file 使用 `FileText`，其它动态模板统一回退 `List`；`imgs` 不参与图标选择，也不得为未知配置模板临时引入页面内近似图标。
 - Settings 页当前仍通过 `settingsPageConfig.ts` 暴露 Automations 分区，并直接渲染 `AutomationsSection`；该入口没有工作区主视图的 Automations `main` 锚点，因此其 Toast 必须走全窗口居中回退。若未来移除此兼容入口，再同步删除本条事实说明。
 - 定时任务主视图不渲染 `WorkspaceHeader` 或草稿标题栏占位，避免出现聊天 / 项目顶部栏。
 - 定时任务管理操作失败时，底层 RPC / Agent 错误只写入 UI logger 供诊断；主视图不得把原始错误以持久红色横幅或原文 toast 暴露给用户。用户侧仅显示与当前动作对应的简短本地化提示，避免重复反馈和泄露 session、command、reasoning effort 等实现细节。

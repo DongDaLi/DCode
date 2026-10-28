@@ -260,8 +260,9 @@ currently mapped to `--color-tag`.
 
 ### Font families
 
-- **UI Sans**: use the app's default `font-sans` stack for almost all interface text.
-- **UI Mono**: use `font-mono` for paths, commands, code, identifiers, shortcuts, commit hashes, model IDs, and terminal-like data.
+- **UI Sans**: use the `font-sans` stack for almost all interface text. The Appearance setting chooses this stack from a built-in list of candidates; the default is the system stack. Candidate stacks must keep an explicit CJK fallback after the Western fonts, otherwise Chinese text falls back to a serif face on Windows.
+- **UI Mono**: use `font-mono` for paths, commands, code, identifiers, shortcuts, commit hashes, model IDs, and terminal-like data. The UI font family setting never changes this stack.
+- Changing the UI font family only rewrites `--font-sans`; it must not touch `--ui-font-size`, the root `html` font size, or any spacing, radius, or icon geometry.
 
 ### UI font tokens
 

@@ -3112,13 +3112,19 @@ const enUS: Record<string, string> = {
   "settings.shortcuts.command.zoomOut": "Zoom Out",
   "settings.shortcuts.command.resetZoom": "Reset Zoom",
   "settings.appearance.interfaceTitle": "Interface Setting",
-  "settings.appearance.interfaceDescription": "Choose the app theme and interface text size.",
+  "settings.appearance.interfaceDescription":
+    "Choose the app theme, interface font, and interface text size.",
   "settings.appearance.codeTitle": "Code settings",
   "settings.appearance.codeDescription":
     "Choose code themes, font size, and display options independently from the interface font size.",
   "settings.uiFontSize": "UI font size",
   "settings.uiFontSizeDescription":
     "Adjust interface text without changing icons or layout dimensions.",
+  "settings.uiFontFamily": "UI font",
+  "settings.uiFontFamilyDescription":
+    "Choose the font used for interface text. Code and terminal fonts are unaffected.",
+  "settings.uiFontFamily.system": "System default",
+  "settings.uiFontFamily.requiresInstall": "Requires manual install",
   "settings.systemTitle": "General",
   "settings.systemDescription": "These preferences affect the current window experience.",
   "settings.locale": "Language",

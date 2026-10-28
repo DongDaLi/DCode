@@ -421,6 +421,8 @@ export function SettingsPage({
   const setCodePreviewSettings = useZCodeStore((state) => state.setCodePreviewSettings);
   const uiFontSizePx = useZCodeStore((state) => state.uiFontSizePx);
   const setUiFontSizePx = useZCodeStore((state) => state.setUiFontSizePx);
+  const uiFontFamilyId = useZCodeStore((state) => state.uiFontFamilyId);
+  const setUiFontFamilyId = useZCodeStore((state) => state.setUiFontFamilyId);
   const notificationEnabled = useZCodeStore((state) => state.notificationEnabled);
   const setNotificationEnabled = useZCodeStore((state) => state.setNotificationEnabled);
   const notificationSoundEnabled = useZCodeStore((state) => state.notificationSoundEnabled);
@@ -2074,6 +2076,22 @@ export function SettingsPage({
                                   completed: {
                                     resultSource: "local_commit",
                                     valueAfter: String(fontSizePx),
+                                  },
+                                  failureStage: "local_commit",
+                                })
+                              }
+                              uiFontFamilyId={uiFontFamilyId}
+                              setUiFontFamilyId={(fontFamilyId) =>
+                                runUserAction({
+                                  input: {
+                                    featureId: "settings.appearance",
+                                    action: "change_ui_font_family",
+                                    trigger: "keyboard",
+                                  },
+                                  operation: () => setUiFontFamilyId(fontFamilyId),
+                                  completed: {
+                                    resultSource: "local_commit",
+                                    valueAfter: fontFamilyId,
                                   },
                                   failureStage: "local_commit",
                                 })

@@ -40,11 +40,15 @@ describe("createHomeOnlyWebRemoteControlServices", () => {
     });
     const selectionSubscription = services.modelSelectionService.onDidChange(() => {});
     expect(() => selectionSubscription.dispose()).not.toThrow();
-    await expect(services.clientScenesService.list()).resolves.toEqual({
-      code: 0,
-      msg: "",
-      data: [],
-    });
+    const clientScenes = await services.clientScenesService.list();
+    expect(clientScenes.code).toBe(0);
+    expect(clientScenes.data.map((scene) => scene.scene)).toEqual([
+      "scheduled-task",
+      "off-peak-task",
+      "draft-suggestion",
+    ]);
+    // 首页推荐胶囊已下线：本地快照的 draft-suggestion 不包含任何 item。
+    expect(clientScenes.data[2]?.options.prompts?.items).toEqual([]);
     await expect(
       services.skillsService.list({ workspacePath: "/remote/offline" }),
     ).resolves.toEqual({

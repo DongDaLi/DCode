@@ -2,7 +2,15 @@ import { once } from "node:events";
 import { createServer, type ServerResponse } from "node:http";
 import type { ClientScenesResponse } from "@zcode/services";
 
-/** 只给需要验证真实模板网格的 case 注入 Client Scenes，避免布局断言依赖远端目录。 */
+/**
+ * 布局 case 的固定 endpoint fixture。
+ *
+ * Client Scenes 已改为仓库内置快照（`docs/client-scenes-local-config.md`），App 不再请求
+ * `/api/v1/client/scenes`；本文件保留 scenes 响应只为证明旧路径兼容，真正决定模板网格的是
+ * `packages/services/src/client-scenes/localClientScenes.ts`。其余路径（启动配置、release、余额）
+ * 仍用于隔离该 case 的启动期网络。
+ */
+
 export const CLIENT_SCENES_AUTOMATIONS_HOME_SPEC = "off-peak-automations-home-layout.test.ts";
 
 export const AUTOMATIONS_HOME_CLIENT_SCENES_FIXTURE = {

@@ -372,7 +372,7 @@ describe("createLocalServices remote authority", () => {
     }
   });
 
-  it("复用 Host 注入的网络 transport 并由 ServiceCollection 释放", async () => {
+  it("Client Scenes 使用本地快照且不发起网络请求，ServiceCollection 仍释放注入的 transport", async () => {
     const home = makeTempHome();
     process.env.HOME = home;
     const transport = {
@@ -394,11 +394,15 @@ describe("createLocalServices remote authority", () => {
     });
 
     try {
-      await expect(services.get(IClientScenesService).list()).resolves.toMatchObject({
-        code: 0,
-        data: [],
-      });
-      expect(transport.fetch).toHaveBeenCalledOnce();
+      const response = await services.get(IClientScenesService).list();
+      expect(response.code).toBe(0);
+      expect(response.data.map((scene) => scene.scene)).toEqual([
+        "scheduled-task",
+        "off-peak-task",
+        "draft-suggestion",
+      ]);
+      // Client Scenes 不再请求远端接口，注入的 transport 不应被该服务使用。
+      expect(transport.fetch).not.toHaveBeenCalled();
     } finally {
       disposeServiceResources(services);
     }

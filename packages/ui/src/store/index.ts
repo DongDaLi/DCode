@@ -31,6 +31,12 @@ import {
   UI_FONT_SIZE_STORAGE_KEY,
 } from "@/lib/uiFontSize.js";
 import {
+  applyUiFontFamilyId,
+  loadUiFontFamilyId,
+  normalizeUiFontFamilyId,
+  UI_FONT_FAMILY_STORAGE_KEY,
+} from "@/lib/uiFontFamily.js";
+import {
   isTaskNotificationEnabled,
   isTaskNotificationSoundPreferenceEnabled,
   persistTaskNotificationEnabled,
@@ -144,6 +150,10 @@ export interface ZCodeState {
   uiFontSizePx: number;
   setUiFontSizePx: (fontSizePx: number) => void;
 
+  /** 界面字体族标识，对应内置候选列表中的一项 */
+  uiFontFamilyId: string;
+  setUiFontFamilyId: (fontFamilyId: string) => void;
+
   /** 是否启用性能模式 */
   performanceMode: boolean;
   setPerformanceMode: (enabled: boolean) => void;
@@ -239,6 +249,7 @@ const BROADCAST_FIELDS = new Set([
   "theme",
   "locale",
   "uiFontSizePx",
+  "uiFontFamilyId",
   "interfaceMode",
   "notificationEnabled",
 ]);
@@ -247,6 +258,7 @@ type BroadcastField =
   | "theme"
   | "locale"
   | "uiFontSizePx"
+  | "uiFontFamilyId"
   | "interfaceMode"
   // 任务通知开关跨窗口同步：角标是应用级表面，A 窗口关通知而 B 窗口仍上报未读时，
   // 主进程 max 聚合会让任务栏/托盘继续亮，设置与提醒状态错位。
@@ -345,6 +357,14 @@ export function createZCodeStore(
       writeSafeLocalStorage(UI_FONT_SIZE_STORAGE_KEY, String(normalizedFontSizePx));
       applyUiFontSizePx(normalizedFontSizePx);
       set({ uiFontSizePx: normalizedFontSizePx });
+    },
+
+    uiFontFamilyId: loadUiFontFamilyId(),
+    setUiFontFamilyId: (fontFamilyId: string) => {
+      const normalizedFontFamilyId = normalizeUiFontFamilyId(fontFamilyId);
+      writeSafeLocalStorage(UI_FONT_FAMILY_STORAGE_KEY, normalizedFontFamilyId);
+      applyUiFontFamilyId(normalizedFontFamilyId);
+      set({ uiFontFamilyId: normalizedFontFamilyId });
     },
 
     performanceMode: loadPerformanceMode(),
@@ -536,6 +556,8 @@ export function createZCodeStore(
         state.setInterfaceMode(normalizeInterfaceMode(msg.payload));
       } else if (field === "uiFontSizePx" && typeof msg.payload === "number") {
         state.setUiFontSizePx(msg.payload);
+      } else if (field === "uiFontFamilyId" && typeof msg.payload === "string") {
+        state.setUiFontFamilyId(msg.payload);
       } else if (field === "notificationEnabled" && typeof msg.payload === "boolean") {
         state.setNotificationEnabled(msg.payload);
       }
@@ -547,6 +569,7 @@ export function createZCodeStore(
   syncSystemThemeListener(useStore.getState().theme);
   applyTheme(useStore.getState().theme);
   applyUiFontSizePx(useStore.getState().uiFontSizePx);
+  applyUiFontFamilyId(useStore.getState().uiFontFamilyId);
   document.documentElement.classList.toggle(
     "dark",
     resolveTheme(useStore.getState().theme) === "dark",

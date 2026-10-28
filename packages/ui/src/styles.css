@@ -141,6 +141,12 @@ html[data-document-hidden] *::after {
 /* === 主题变量 === */
 
 @theme {
+  /* 界面字体族。显式声明而不是沿用 Tailwind 默认栈，原因与下方 --font-mono 一致：
+   * Tailwind 默认栈没有 CJK 兜底，用户选中的西文字体缺中文字形时中文会落到宋体。
+   * 运行时由 uiFontFamily 模块改写 html 上的 --font-sans（inline 优先级高于本规则）。 */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei",
+    "Noto Sans CJK SC", sans-serif;
   /* 修复原因：Windows 的 Consolas 不含中文字形，Tailwind 默认栈最终会让中文落到宋体。
    * 保留各平台西文等宽字体，并在通用 monospace 前显式加入各平台 CJK 无衬线字体。 */
   --font-mono:

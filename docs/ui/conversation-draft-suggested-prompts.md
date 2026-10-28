@@ -2,8 +2,11 @@
 
 ## 背景
 
-新版 New task 首页在 Chat composer 正下方增加「推荐提示词」入口。原有横向按钮组由
-`clientScenesService` 的 `draft-suggestion` scene 下发；主动任务推荐列表使用本地按功能维护的推荐池。
+新版 New task 首页在 Chat composer 正下方增加「推荐提示词」入口。该横向按钮组由
+`clientScenesService` 的 `draft-suggestion` scene 下发，该 scene 现在来自仓库内置配置
+（`packages/services/src/client-scenes/localClientScenes.ts`），不再请求远端接口；主动任务推荐列表
+仍使用本地按功能维护的推荐池。当前内置配置的 `draft-suggestion.options.prompts.items` 为空，
+因此编程模式不展示这一排胶囊。
 
 ## 主动任务推荐
 
@@ -154,7 +157,7 @@ operation A active
   按名称动态加载对应 SVG。图标不设置独立颜色，使用 `currentColor` 继承图标槽的 `text-foreground`；
   `img` 为空、名称不属于当前 Lucide 版本或模块加载失败时回退中性的 `SquareCode`。不要读取 locale
   相关的 `imgs.cn` / `imgs.en`。
-- 服务端 i18n 字段使用 `cn` / `en`；`zh-CN` 读取 `cn`，`en-US` 读取 `en`，字段为空时回退另一语言。
+- 配置 i18n 字段使用 `cn` / `en`；`zh-CN` 读取 `cn`，`en-US` 读取 `en`，字段为空时回退另一语言。
 
 ## Client Scenes 映射
 
@@ -172,28 +175,27 @@ operation A active
 | `plugin.label`             | 同一个匹配 item 的 `labels`（`cn` / `en`）                                                                                      |
 
 `defaults` 缺失、option key 不存在、item id 不存在或 Plugin stable ID 为空时，该推荐项按无 Plugin 处理。
-当前 `DraftSuggestedPromptItem` 只支持一个 Plugin，因此存在多个有效 defaults 引用时按服务端声明顺序取第一个。
+当前 `DraftSuggestedPromptItem` 只支持一个 Plugin，因此存在多个有效 defaults 引用时按配置声明顺序取第一个。
 
-Client Scenes 通过共享 `useClientScenesResource()` 获取：与同一 Service authority 下的 scheduled / off-peak
-模板并发挂载时只发出一次请求。冷缓存加载期间展示空列表；已有缓存时立即映射并展示旧目录，后台重验
-不得清空列表。接口首次失败、响应 `code !== 0`、缺少 `draft-suggestion` scene 或缺少
-`options.prompts` 时展示空列表，不回退到本地静态推荐；已有缓存的重验失败保留 last-known-good 推荐项。
-接口失败使用 UI logger `warn`，不影响 Composer。locale 切换只重新映射缓存中的 i18n 字段，不触发请求。
-缓存去重窗口为 10 分钟；页面实际经历 hidden 后重新 visible 时必须绕过去重窗口强制重验一次，同一
-Service/cache authority 的多个推荐项或模板消费方不得重复请求。
+Client Scenes 数据来自 `clientScenesService.list()` 返回的仓库内置快照（见
+`docs/client-scenes-local-config.md`），经共享 `useClientScenesResource()` 取得；与同一 Service authority 下的
+scheduled / off-peak 模板并发挂载时只解析一次。数据不来自网络，因此没有请求失败、业务错误码、重试或
+后台重验分支：首次解析期间保持空列表与既有 `h-8` 空槽位，解析完成后一次性填入。缺少 `draft-suggestion`
+scene、`options.prompts` 或 `items` 为空时展示空列表并整排不渲染，不回退到本地静态推荐池；当前内置配置
+的 `items` 为空，因此编程模式不展示这一排。locale 切换只重新映射快照中的 i18n 字段，不重新获取数据。
 
 ## 状态剪枝与覆盖
 
 | Case  | 状态                                            | 期望                                                                                                                                                                                                                     | 覆盖         |
 | ----- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ |
-| DSP01 | `draft-suggestion` prompt item、无 defaults     | 映射服务端 i18n，替换为纯 prompt，不自动发送                                                                                                                                                                             | focused unit |
+| DSP01 | `draft-suggestion` prompt item、无 defaults     | 映射配置 i18n，替换为纯 prompt，不自动发送                                                                                                                                                                               | focused unit |
 | DSP02 | defaults 反查到 Plugin，首次解析即 ready        | 解析前不写入；结果返回后一次性替换为 chip + prompt，不失效 Runtime、不二次解析、不读取 workspace catalog；可选 icon 随结构化 chip 写入                                                                                   | focused unit |
 | DSP03 | Plugin missing                                  | 首次本地检查缺失后先发 `refreshing`，唯一 Popover 进入 loading；只刷新官方市场，10000ms 超时中止并 fail closed；完成后一次性写入纯 prompt；Composer 消费后同一 Popover 原地切换为无时限确认态，点击 Popover 外部静默取消 | focused unit |
 | DSP04 | Plugin disabled / conflicted / catalog 请求失败 | disabled 先让唯一 Popover 进入 loading，再一次性写入纯 prompt，Composer 消费后原地切换为确认；conflict/失败不增加第二个 Popover；请求携带 clientMode/deliveryKind                                                        | unit         |
 | DSP05 | 安装或启用期间点击另一个推荐项                  | 静默关闭旧 Plugin action Popover 并取消旧 operation；取消收敛前禁用其他推荐项；迟到结果不覆盖新选择                                                                                                                      | focused unit |
 | DSP06 | 安装完成且用户已编辑草稿                        | Popover 进度常驻；保留正文，将唯一 Plugin chip 前置；Composer 更新后在同一 Popover 以模型标签同款纵向滚动显示成功，不自动发送                                                                                            | focused unit |
 | DSP07 | 安装或启用失败或安装达到 10000ms                | 安装失败恢复确认 Popover 并允许重试；启用失败显示失败结果；安装超时取消 operation，纯 prompt 保留                                                                                                                        | focused unit |
-| DSP08 | scenes 加载失败/非成功 code/目标配置缺失        | 空列表，Composer 保持可用                                                                                                                                                                                                | unit         |
+| DSP08 | 缺少目标 scene / `options.prompts` / `items` 为空 | 空列表并整排不渲染，Composer 保持可用                                                                                                                                                                                   | unit         |
 | DSP09 | locale 为 `zh-CN` / `en-US`                     | 分别使用 `cn` / `en`，缺失时跨语言回退                                                                                                                                                                                   | unit         |
 | DSP10 | `img` 有效 / 缺失 / 加载失败，且 `imgs` 任意    | 有效图标；其余回退占位且忽略 `imgs`                                                                                                                                                                                      | focused unit |
 | DSP11 | Plugin 首次可信解析期间用户修改 Composer        | revision 变化后静默放弃延迟写入和 Popover，当前草稿不被覆盖                                                                                                                                                              | focused unit |
@@ -219,14 +221,14 @@ Service/cache authority 的多个推荐项或模板消费方不得重复请求�
 | Change layers  | `option-source`、`presentation`、`draft-default`、`validation`、`commit-effect`                                                                                                                                         |
 | UI surface     | New Task 草稿页 `ConversationDraftSuggestedPrompts`                                                                                                                                                                     |
 | Draft owner    | renderer-local Composer draft / workspace-scoped insert request                                                                                                                                                         |
-| Option source  | `clientScenesService.list()` → `draft-suggestion.options.prompts.items`                                                                                                                                                 |
-| Validation     | Client Scenes 映射边界 + 目标 Host `plugins/resolveSuggestedReference` 可信解析                                                                                                                                         |
+| Option source  | `clientScenesService.list()` → 本地内置 `LOCAL_CLIENT_SCENES` 的 `draft-suggestion.options.prompts.items`                                                                                                              |
+| Validation     | Client Scenes 配置映射边界 + 目标 Host `plugins/resolveSuggestedReference` 可信解析                                                                                                                                     |
 | Commit sink    | `requestComposerTextInsert`；不调用 `onSendText`                                                                                                                                                                        |
 | Persistence    | 既有 V4 Composer draft persistence                                                                                                                                                                                      |
 | Invariants     | 普通 prompt 替换且不自动发送；导航 action 不预填；OFFPEAK 只在现有 Idle tab 间切换；Plugin 不可用时纯 prompt；workspaceIdentity 隔离；手机 `/remote` 不新增 Automations 入口；操作携带 clientMode/deliveryKind 且可取消 |
 | Graph evidence | `capability.plugin-reference` + 新增 suggested-prompts surface；当前环境无 codegraph，使用 feature graph seeds 与 depth-2 精确调用点核对                                                                                |
 
-组件继续作为纯展示和点击入口；服务端配置只提供候选与 capability hint，UI 只消费目标 Host 的可信解析结果，
+组件继续作为纯展示和点击入口；内置配置只提供候选与 capability hint，UI 只消费目标 Host 的可信解析结果，
 不再读取 workspace catalog，并保持单行标题、隐藏 Plugin 引用、替换草稿且不自动发送的既有契约。
 
 ## Prompt 模板点击埋点

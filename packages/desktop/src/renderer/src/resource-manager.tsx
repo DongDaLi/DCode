@@ -8,8 +8,11 @@ import "@zcode/ui/styles.css";
 import {
   ResourceManagerApp,
   ZCodeIntlProvider,
+  applyUiFontFamilyId,
   applyUiFontSizePx,
+  loadUiFontFamilyId,
   loadUiFontSizePx,
+  subscribeToUiFontFamilyStorageChanges,
   subscribeToUiFontSizeStorageChanges,
 } from "@zcode/ui";
 
@@ -56,6 +59,9 @@ applyResourceManagerTheme();
 // 首屏前显式应用，运行中再由 storage 事件同步，且不改变 html font-size 或接入业务 Host。
 applyUiFontSizePx(loadUiFontSizePx());
 subscribeToUiFontSizeStorageChanges();
+// 界面字体族同理：不接主窗口 store，独立窗口自己读偏好并同步 storage 变化。
+applyUiFontFamilyId(loadUiFontFamilyId());
+subscribeToUiFontFamilyStorageChanges();
 
 const root = document.getElementById("root");
 if (root) {
