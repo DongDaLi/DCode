@@ -105,6 +105,10 @@ describe("ConversationShareReadonlyTimeline", () => {
       }),
     );
     expect(html).toContain('data-v4-user-input-bubble="true"');
+    // 分享页与主会话保持同一条规则：用户输入卡占满整行，不再以 max-w-xl 收窄。
+    const bubbleTag = html.match(/<div[^>]*data-v4-user-input-bubble="true"[^>]*>/)?.[0] ?? "";
+    expect(bubbleTag).toContain("w-full");
+    expect(bubbleTag).not.toContain("max-w-xl");
     expect(html).toContain("这是");
     expect(html).toContain('data-conversation-share-turn="turn-1"');
     expect(html).toContain("搜索");

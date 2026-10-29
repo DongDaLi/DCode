@@ -24,7 +24,8 @@ export function ConversationUserInputBubble({
   return (
     <div
       data-v4-user-input-bubble="true"
-      className="flex max-w-full flex-col gap-2 rounded-xl rounded-tr-xs border border-border bg-surface px-4 py-3 text-ui-base text-foreground @min-[624px]/conversation:max-w-xl"
+      // 用户消息卡与下方 composer 同宽：占满消息行，不再按宿主宽度以 max-w-xl 收窄。
+      className="flex w-full flex-col gap-2 rounded-xl rounded-tl-xs border border-border bg-surface px-4 py-3 text-ui-base text-foreground"
     >
       {text.trim() ? (
         <ConversationUserInputBody contentText={text} rowId={rowId}>

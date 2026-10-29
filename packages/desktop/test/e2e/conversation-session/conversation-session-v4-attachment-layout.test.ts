@@ -78,8 +78,9 @@ describe("AL01-AL20：附件界面改版", () => {
     expect(sent.fileNames).toEqual([LONG_FILE, SECOND_FILE]);
     expect(sent.filePillsAreRoundAndBorderless).toBe(true);
     expect(sent.pillOrder).toEqual(["file", "file", "comment", "web", "pptx", "selection"]);
-    expect(sent.rightEdgesAligned).toBe(true);
-    expect(sent.bubbleWidth).toBeLessThan(sent.rowWidth - 8);
+    expect(sent.leftEdgesAligned).toBe(true);
+    // 气泡与用户消息行等宽：不再以 max-w-xl 收窄，才能和下方 composer 对齐。
+    expect(Math.abs(sent.bubbleWidth - sent.rowWidth)).toBeLessThanOrEqual(2);
     expect(sent.emptyUserRows).toBe(0);
     await assertContextHoverAlignment("sent");
     await assertNarrowSentWrap();
@@ -433,8 +434,8 @@ function readSentLayout() {
         ),
         bubbleWidth: bubbleRect?.width ?? 0,
         pillOrder: pillChildren.map(classify).filter((kind) => kind !== "unknown"),
-        rightEdgesAligned: Boolean(
-          areaRect && bubbleRect && Math.abs(areaRect.right - bubbleRect.right) <= 2,
+        leftEdgesAligned: Boolean(
+          areaRect && bubbleRect && Math.abs(areaRect.left - bubbleRect.left) <= 2,
         ),
         rowWidth: rowRect?.width ?? 0,
       };
@@ -463,9 +464,8 @@ async function assertContextHoverAlignment(surface: "composer" | "sent") {
       .getElement()
       .then((element) => browser.execute((item) => item.getBoundingClientRect().toJSON(), element)),
   ]);
-  if (surface === "composer")
-    expect(Math.abs(triggerRect.left - contentRect.left)).toBeLessThanOrEqual(3);
-  else expect(Math.abs(triggerRect.right - contentRect.right)).toBeLessThanOrEqual(3);
+  // 用户消息侧与输入框侧都统一 start 对齐，浮层与触发 pill 共享左边缘。
+  expect(Math.abs(triggerRect.left - contentRect.left)).toBeLessThanOrEqual(3);
   await browser.keys("Escape");
 }
 
@@ -482,21 +482,21 @@ async function assertNarrowSentWrap() {
     const bubble = userRow?.querySelector<HTMLElement>("[data-v4-user-input-bubble]");
     const children = Array.from(row?.children ?? []) as HTMLElement[];
     const tops = new Set(children.map((item) => Math.round(item.getBoundingClientRect().top)));
-    const right = row?.getBoundingClientRect().right ?? 0;
+    const left = row?.getBoundingClientRect().left ?? 0;
     const bubbleWidth = bubble?.getBoundingClientRect().width ?? 0;
     const userRowWidth = userRow?.getBoundingClientRect().width ?? 0;
     return {
       bubbleWithinContainer: bubbleWidth > 0 && bubbleWidth <= userRowWidth + 2,
       noDocumentOverflow:
         document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-      rightAligned: children.every((item) => item.getBoundingClientRect().right <= right + 1),
+      leftAligned: children.every((item) => item.getBoundingClientRect().left >= left - 1),
       wrapped: tops.size > 1,
     };
   });
   expect(state).toEqual({
     bubbleWithinContainer: true,
     noDocumentOverflow: true,
-    rightAligned: true,
+    leftAligned: true,
     wrapped: true,
   });
   await sendRendererEmulationCommand("Emulation.clearDeviceMetricsOverride");

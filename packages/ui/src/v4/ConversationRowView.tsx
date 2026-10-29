@@ -1148,7 +1148,7 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
 
   if (editing) {
     return (
-      <RowShell rowId={row.rowId} className="flex flex-col items-end">
+      <RowShell rowId={row.rowId} className="flex flex-col items-start">
         <ChatPromptEditor
           workspacePath={context.workspacePath}
           taskId={context.sessionId ?? null}
@@ -1269,7 +1269,8 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
               )}
             </ControlHintTooltip>
           }
-          className="w-full max-w-xl"
+          // 编辑态与已发送消息、下方 composer 共用整行宽度与左对齐。
+          className="w-full"
           shellClassName="min-h-32"
           onChange={setDraft}
           onSubmit={(nextText) => {
@@ -1295,11 +1296,11 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
   }
 
   return (
-    <RowShell rowId={row.rowId} className="group/user-row flex flex-col items-end">
+    <RowShell rowId={row.rowId} className="group/user-row flex flex-col items-start">
       {isScheduledAutomationPrompt ? (
         <div
           data-v4-user-input-automation-origin="schedule"
-          className="mb-1 flex max-w-xl items-center gap-1 text-ui-sm text-foreground-subtle"
+          className="mb-1 flex w-full items-center gap-1 text-ui-sm text-foreground-subtle"
         >
           <Clock data-cron-task-icon="true" aria-hidden="true" className="size-3.5 shrink-0" />
           <span>{intl.formatMessage({ id: "chat.message.sentByScheduledTask" })}</span>
@@ -1316,20 +1317,20 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
         <div
           data-v4-user-input-attachments="true"
           data-testid={testId(TID_V4_ROW_ATTACHMENTS, String(row.rowId))}
-          className="mb-2 flex max-w-xl flex-col items-end gap-2"
+          className="mb-2 flex w-full flex-col items-start gap-2"
         >
           {row.botGroupSource && conversationSelections.length > 0 ? (
-            <div data-v4-user-input-quotes="true" className="flex max-w-full justify-end">
+            <div data-v4-user-input-quotes="true" className="flex max-w-full justify-start">
               <ConversationSelectionReferenceChip
                 references={conversationSelections}
-                contentAlign="end"
+                contentAlign="start"
               />
             </div>
           ) : null}
           {hasMediaAttachments ? (
             <div
               data-v4-user-input-media-attachments="true"
-              className="flex max-w-full flex-wrap justify-end gap-2"
+              className="flex max-w-full flex-wrap justify-start gap-2"
             >
               <UserInputAttachmentList
                 attachments={row.attachments}
@@ -1347,8 +1348,8 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
             <div
               data-v4-user-input-attachment-pills="true"
               // 非媒体文件与上下文引用必须共享这一层，才能在换行时
-              // 保持“文件→评论→网页→PPT→对话引用”的顺序和统一右对齐。
-              className="flex max-w-full flex-wrap justify-end gap-2"
+              // 保持“文件→评论→网页→PPT→对话引用”的顺序和统一左对齐。
+              className="flex max-w-full flex-wrap justify-start gap-2"
             >
               {hasFileAttachments ? (
                 <UserInputAttachmentList
@@ -1362,28 +1363,27 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
                   readAttachmentRange={context.readAttachmentRange}
                 />
               ) : null}
-              <CodeCommentAttachmentChip comments={codeCommentContexts} contentAlign="end" />
-              <WebElementContextAttachmentChip contexts={webElementContexts} contentAlign="end" />
+              <CodeCommentAttachmentChip comments={codeCommentContexts} contentAlign="start" />
+              <WebElementContextAttachmentChip contexts={webElementContexts} contentAlign="start" />
               <PptxElementReferenceChip
                 references={pptxElementReferences}
-                contentAlign="end"
+                contentAlign="start"
                 onOpen={context.onOpenCodeViewer ? openPptxElementReference : undefined}
               />
               {!row.botGroupSource ? (
                 <ConversationSelectionReferenceChip
                   references={conversationSelections}
-                  contentAlign="end"
+                  contentAlign="start"
                 />
               ) : null}
-              <PluginUiModelContextChip contexts={pluginUiContexts} contentAlign="end" />
+              <PluginUiModelContextChip contexts={pluginUiContexts} contentAlign="start" />
             </div>
           ) : null}
         </div>
       ) : null}
       {hasBubble ? (
         // 附件和上下文引用只属于消息行，不属于气泡；否则仅附件消息会留下空气泡。
-        // 同一 row 会渲染在主会话和 Subagent 侧栏，固定宽度会忽略实际宿主宽度。
-        // 气泡保留 flex item 的自动宽度；宿主至少 624px 时再以 36rem 封顶并保留 48px 余量。
+        // 气泡宽度由消息行决定（w-full），不再按宿主宽度另设上限，才能与下方 composer 对齐。
         <ConversationUserInputBubble
           text={visibleText}
           contentParts={row.botGroupSource?.contentParts}
@@ -1395,7 +1395,7 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
       ) : null}
       {row.source?.kind === "genUi" && (
         <div
-          className="mt-1 text-right text-ui-sm text-foreground-subtlest"
+          className="mt-1 text-left text-ui-sm text-foreground-subtlest"
           data-v4-user-input-source="genUi"
         >
           {intl.formatMessage({ id: "genUi.from" }, { name: row.source.title || "Gen UI" })}
@@ -1405,7 +1405,7 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
         // 插件 UI 代发：来源标记来自 CLI 持久化的 intent.source，不由 renderer 推断。
         <div
           data-v4-user-input-source={row.source.pluginId}
-          className="mt-1 text-right text-ui-sm text-foreground-subtlest"
+          className="mt-1 text-left text-ui-sm text-foreground-subtlest"
         >
           {intl.formatMessage(
             { id: "pluginUi.fromPlugin" },
@@ -1416,7 +1416,7 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
       {status ? (
         <div
           data-v4-user-input-status="true"
-          className="mt-1 text-right text-ui-sm text-foreground-subtlest"
+          className="mt-1 text-left text-ui-sm text-foreground-subtlest"
           aria-live="polite"
         >
           {status}

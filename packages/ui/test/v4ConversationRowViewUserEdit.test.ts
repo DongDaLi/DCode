@@ -1640,7 +1640,7 @@ describe("ConversationRowView user query editing", () => {
     });
   });
 
-  it("right-aligns PPT and conversation-reference hover cards in sent user rows", async () => {
+  it("left-aligns PPT and conversation-reference hover cards in sent user rows", async () => {
     const pptxElement: PptxElementReference = {
       id: "pptx-1",
       workspacePath: "/workspace",
@@ -1689,7 +1689,8 @@ describe("ConversationRowView user query editing", () => {
     });
 
     expect(hoverCardContentProps).toHaveLength(4);
-    expect(hoverCardContentProps.every((props) => props.align === "end")).toBe(true);
+    // 用户消息改为左对齐后，浮层与 pill 共享左边缘并向右侧展开。
+    expect(hoverCardContentProps.every((props) => props.align === "start")).toBe(true);
 
     await act(async () => {
       root.unmount();
@@ -1794,6 +1795,8 @@ describe("ConversationRowView user query editing", () => {
 
     expect(chatPromptEditorProps).toHaveLength(1);
     expect(chatPromptEditorProps[0]?.initialValue).toBe(row.text);
+    // 编辑态输入框与已发送气泡、下方 composer 同宽：不再靠右，也不再收窄到 max-w-xl。
+    expect(chatPromptEditorProps[0]?.className).toBe("w-full");
     const submitEdit = chatPromptEditorProps[0]?.onSubmit;
     expect(typeof submitEdit).toBe("function");
 

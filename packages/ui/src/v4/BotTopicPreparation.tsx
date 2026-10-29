@@ -39,7 +39,7 @@ export function BotTopicPreparationList({
         <div
           key={item.messageId}
           data-topic-preparation={item.messageId}
-          className="flex min-w-0 flex-col items-end"
+          className="flex min-w-0 flex-col items-start"
         >
           <div
             data-topic-preparation-source="true"

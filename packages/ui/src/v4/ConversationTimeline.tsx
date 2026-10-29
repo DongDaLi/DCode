@@ -2169,7 +2169,9 @@ function ConversationTimelineImpl({
                   "pointer-events-auto relative z-10 w-full shrink-0 transition-[width,max-width,transform] duration-150 ease-out @min-[1280px]/conversation:transition-[transform]",
                   contentWidthClassName,
                   // 浮窗形态下输入框外壳就是浮窗最外层，不留内边距。
-                  !centeredEmptyLayout && !floatingComposerDock && "px-4 pb-4",
+                  // 水平内边距与消息列（ConversationTurnGroup 的 px-4 @md:px-6）保持同步，
+                  // 否则输入框会比用户消息卡每侧宽 8px，看上去仍然没对齐。
+                  !centeredEmptyLayout && !floatingComposerDock && "px-4 @md/conversation:px-6 pb-4",
                   !centeredEmptyLayout && summaryPanelInlineOffsetClassName,
                 )}
               >

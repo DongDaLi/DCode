@@ -267,10 +267,10 @@ function UserInputPresentation({
 }) {
   const attachments = row.attachments ?? [];
   return (
-    <div className="flex flex-col items-end" data-conversation-share-row-kind="userInput">
+    <div className="flex flex-col items-start" data-conversation-share-row-kind="userInput">
       {attachments.length > 0 ? (
         <div
-          className="mb-2 flex w-full max-w-xl flex-wrap items-start justify-end gap-2"
+          className="mb-2 flex w-full flex-wrap items-start justify-start gap-2"
           data-v4-user-input-attachments="true"
         >
           {attachments.map((attachment, index) => (
@@ -284,7 +284,7 @@ function UserInputPresentation({
       ) : null}
       <div
         data-v4-user-input-bubble="true"
-        className="flex max-w-xl flex-col gap-2 rounded-xl rounded-tr-xs border border-border bg-surface px-4 py-3 text-ui-base text-foreground"
+        className="flex w-full flex-col gap-2 rounded-xl rounded-tl-xs border border-border bg-surface px-4 py-3 text-ui-base text-foreground"
       >
         <ConversationUserInputBody contentText={row.text} rowId={row.rowId}>
           <ConversationUserInputContent
